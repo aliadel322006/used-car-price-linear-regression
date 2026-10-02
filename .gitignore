@@ -1,0 +1,13 @@
+# Large data files (the compressed vehicle_sales_clean.zip is included instead)
+vehicle_sales_clean.csv
+cleaned_vehicle_sales.csv
+vehicle_sales_clean.parquet
+*.csv
+*.xlsx
+*.rar
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/

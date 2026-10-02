@@ -1,0 +1,8 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+jupyter
+# only needed to re-run EDA_CARSPRIVE.ipynb (reads from a local SQL Server)
+pyodbc
