@@ -1,39 +1,36 @@
-# Used Car Price Prediction - Linear Regression from Scratch
+# Used car price prediction with linear regression from scratch
 
-Exploratory analysis of used car auction sales, followed by a linear regression model written **from scratch in NumPy** (Batch Gradient Descent and Stochastic Gradient Descent) and compared with scikit-learn.
+In this project I explore a used car sales dataset and then predict the selling price with linear regression. I wrote the model myself in NumPy, trained it with Batch Gradient Descent and with Stochastic Gradient Descent (SGD), and compared it with scikit-learn.
 
 ## Dataset
 
-- **558,723 rows** and 28 columns after cleaning. Each row is one used car sale.
-- **Target:** `SellingPrice`.
-- Features used for the model: `CarAge`, `Odometer`, `ConditionValue`, `Make`, `Model`, `Body`, `Transmission`, `State`, `Color`, `Interior`, plus two squared features (`CarAge2`, `Odometer2`).
-- The cleaned data is stored in `vehicle_sales_clean.zip` (the notebook reads it directly with `pd.read_csv`).
+The cleaned data has 558,723 rows and 28 columns. Each row is one used car sale, and the target is `SellingPrice`. It is stored in `vehicle_sales_clean.zip`, and the notebook reads it directly with `pd.read_csv`.
+
+For the model I use `CarAge`, `Odometer`, `ConditionValue`, `Make`, `Model`, `Body`, `Transmission`, `State`, `Color` and `Interior`. I also added two centered squared columns, `CarAge2` and `Odometer2`.
 
 ## What I did
 
-1. **EDA and cleaning** (`EDA_CARSPRIVE.ipynb`): data quality checks, filling missing values, flagging outliers (not deleting them), feature engineering, charts, KPIs and validation. This notebook loads the raw data from a local SQL Server database, so it can only be re-run with that database. Its saved outputs can still be read on GitHub.
-2. **Modeling** (`ml.ipynb`):
-   - Linear regression from scratch with **Batch Gradient Descent** and **Stochastic Gradient Descent (SGD)**.
-   - Compared with scikit-learn's `LinearRegression` and `SGDRegressor`.
-   - Preparation: grouping rare categories into "other", one-hot encoding, centered squared features, and scaling all columns (scaler fit on the train set only).
-3. **Dashboard:** `used car sales dashboard.pbix.pbix` (Power BI).
+1. `EDA_CARSPRIVE.ipynb`: data quality checks, cleaning, feature engineering, charts and KPIs. It loads the raw data from a local SQL Server database, so you can't re-run it without that database. The saved outputs are still readable on GitHub.
+2. `ml.ipynb`: linear regression from scratch with Batch GD and SGD, compared with scikit-learn's `LinearRegression` and `SGDRegressor`. Before training I grouped rare categories into "other", one-hot encoded the text columns, and scaled all the columns.
+3. `used car sales dashboard.pbix.pbix`: a Power BI dashboard.
 
-## Results (R² on the test set)
+## Results
+
+R² on the test set:
 
 | Model | Training method | R² |
 |---|---|---|
-| My `linearregression` (lr=0.3, 2000 iterations) | Batch Gradient Descent | 0.7906 |
-| sklearn `LinearRegression` | Closed-form solution | 0.7907 |
-| My `sgd` (lr=0.001, 5 epochs) | Stochastic Gradient Descent | 0.7830 |
-| sklearn `SGDRegressor` | Stochastic Gradient Descent | 0.7869 |
+| My `linearregression` (lr=0.3, 2000 iterations) | Batch GD | 0.7906 |
+| sklearn `LinearRegression` | Closed form | 0.7907 |
+| My `sgd` (lr=0.00001, 5 epochs) | SGD | 0.7900 |
+| sklearn `SGDRegressor` (eta0=0.00001, constant learning rate, 5 epochs) | SGD | 0.7886 |
 
-## Key findings
+## What I learned
 
-- The model and the training method are different things: all four are the same linear model, and only the way the weights are found differs.
-- My Batch GD reached almost the same R² as sklearn's `LinearRegression` (0.7906 vs 0.7907).
-- Scaling all columns and centering the squared features made Batch GD much closer to the optimum (R² 0.6567 before, 0.7906 after).
-- Batch GD needed about 2000 iterations, while SGD needed only 5 epochs. Pure SGD in Python is slow on large data.
-- Linear regression cannot capture non-linear effects and interactions. A quick tree-based model test in an earlier experiment (not shown in the notebook) reached R² 0.93.
+- My Batch GD ends very close to sklearn's `LinearRegression` (0.7906 vs 0.7907). My first try scored only 0.6567, and it got much better after I scaled all the columns and centered the squared features.
+- SGD needed only 5 epochs, while Batch GD needed about 2000 iterations.
+- SGD blew up at first. Scaled rare one-hot columns have large values for the few rows that have them, and with a big learning rate one of those rows makes a huge step. A smaller learning rate fixed my SGD. For sklearn I also had to use a constant learning rate.
+- Linear regression can't capture curves and interactions. A quick tree-based model test in an earlier experiment (not shown in the notebook) reached 0.93, so I want to study tree models next.
 
 ## Sample charts
 
@@ -48,7 +45,7 @@ pip install -r requirements.txt
 jupyter notebook ml.ipynb
 ```
 
-Run `ml.ipynb` from this folder so that `vehicle_sales_clean.zip` is found. `EDA_CARSPRIVE.ipynb` additionally needs `pyodbc` and a local SQL Server instance with the `MotoDB.VehicleSales` table.
+Run `ml.ipynb` from this folder so it can find `vehicle_sales_clean.zip`. To run `EDA_CARSPRIVE.ipynb` you also need `pyodbc` and a local SQL Server with the `MotoDB.VehicleSales` table.
 
 ## Requirements
 
